@@ -1,0 +1,87 @@
+import requests     # Importing request Library.
+from bs4 import BeautifulSoup    # Import BeautifulSoup from above.
+import re   # Importing Regular Expression.
+
+
+
+
+url = 'https://www.themoviedb.org'   # This is  outer Link.
+header={'User-Agent':
+        'Mozilla/5.0(WindowsNT6.3;Win64;x64)AppleWebKit/537.36(KHTML,like Gecko)Chrome/99.0.4844.51 Safari/537.36'}
+all_page_urls = []   # Taking a empty list.
+
+
+
+
+for i in range(1,26):   # Using for loop For Fetching URLS .
+        num = str(i)    # Taking num Variable For Store i in String.
+        all_response_data = requests.get(url+'/movie?page='+num, headers = header).text # Get the all_Response_data from the URL website.
+        all_soup_data = BeautifulSoup(all_response_data) # Using BeautifulSoup to parse the all_Response_data.
+        all_divs = all_soup_data.find_all('div',class_='card style_1') # Creating one varialble to store common base of box.
+
+
+
+
+        for item in all_divs:  # Using For Loop to Fetch All Data From all_divs.
+                name = item.find('h2')   # Fetching Movi_Name.
+                link = name.find('a')['href']
+                Movie_Name = item.find('h2').text
+                # print(Movie_Name)                                          # Print to Fetch name
+
+                Url = url + link
+                # print(Url)                                                 # Print to Fetch Url.
+
+
+                inside_page_data = requests.get(Url,headers = header).text # This is Inner Link.
+                soupdata_of_insidepage = BeautifulSoup(inside_page_data,'lxml') # Using BeautifulSoup to parse the inside_page_data.
+
+                if soupdata_of_insidepage.find('span',class_='runtime') == None:
+                    runtime = 'N/A'
+
+                elif soupdata_of_insidepage.find('span',class_='runtime') != None:
+                    runtime = soupdata_of_insidepage.find('span',class_='runtime').text
+                    # print(runtime)                                       # Print to Fetch run_time.
+
+                rating = soupdata_of_insidepage.find('div',class_='percent')
+                rating1 = rating.find('span')['class'][1].strip('icon-r')
+                #print(rating1)                                           # Print to Fetch rating.
+
+                genre = soupdata_of_insidepage.find('span',class_='genres').text.strip()
+                # print(genre)                                           # Print to Fetch genre.
+
+                release_date = soupdata_of_insidepage.find('span',class_='release').text.strip()
+                release_date1 = release_date[:-4]
+                # print(release_date1)                                  # Print to Fetch release_date1.
+
+                director_name = soupdata_of_insidepage.find('ol',class_='people no_image')
+                dir = director_name.find_all('li',class_='profile')
+                for items in dir:               # Using For Loop For Fetching Director Name.
+                    a = items.find('p',class_='character').text
+                    if a.count('Director') == 1:
+                        director_name = items.find('a').text
+                        print(director_name)                            # Print to Fetch director_name
+                    else:
+                        print('N/A')
+
+                all_page_info = {                       # Store all keys and values in one dictionary.
+                    'Name': Movie_Name,
+                    'Rating': rating1,
+                    'Genre': genre,
+                    'Release Date': release_date1,
+                    'Run Time': runtime,
+                    'Director': director_name,
+                    'URL': Url }
+                all_page_urls.append(all_page_info)    # Taking all_page_urls in empty list.
+                print(all_page_urls)                                          # Print to get all_page_urls.
+
+
+
+
+
+
+
+import pandas as pd    # Import pandas Librarie.
+df = pd.DataFrame(all_page_urls)    # Createing DataFrame using panda.
+df  # Print to get DF out put.
+df.to_excel('Movie_data.xlsx')    # Create all page info in excel.
+pwd  # Used PWD to check the file location.
