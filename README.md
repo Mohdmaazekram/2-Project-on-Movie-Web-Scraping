@@ -16,9 +16,8 @@ This Python script scrapes movie data from The Movie Database (TMDb) website and
     * Appends each movie dictionary to a list to store all movie information.
   
 4) **Data Storage:**
-   
-   *Transforms the list of dictionaries into a pandas DataFrame for easier manipulation.
-   * Outputs the DataFrame to an Excel file named "Movie_data.xlsx".
+    * Transforms the list of dictionaries into a pandas DataFrame for easier manipulation.
+    * Outputs the DataFrame to an Excel file named "Movie_data.xlsx".
   
 6) **GitHub Repository Integration:**
     * Designed for uploading to a GitHub repository.
